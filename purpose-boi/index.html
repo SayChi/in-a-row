@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<script>
+		'use strict';
+
+		let width = 7;
+		let height = 6;
+		let winLength = 4;
+		let winDirs = [
+			{x: 1, y: 0},
+			{x: 1, y: 1},
+			{x: 0, y: 1},
+			{x: -1, y: 1}
+		];
+
+		let searchDepth = 6;
+
+		function createField() {
+			let field = new Array(width);
+			field.fill(new Array(height));
+			field.map(row => row.fill(0));
+
+			return field;
+		}
+
+		function createWinMask() {
+			let winMask = [];
+
+			for (var x = 0; x < width; x++) {
+				for (var y = 0; y < height; y++) {
+					for (var i = 0; i < winDirs.length; i++) {
+						let winDir = winDirs[i];
+						let winRow = [];
+
+						for (var d = 0; d < winLength; d++) {
+							let dx = d * winDir.x;
+							let dy = d * winDir.y;
+
+							let x2 = x + dx;
+							let y2 = y + dy;
+
+							if (0 > x2 || x2 > width - 1 || 0 > y2 || y2 > height - 1) {break;}
+
+							winRow.push({x: x2, y: y2});
+						}
+
+						if (winRow.length == winLength) {
+							winMask.push(winRow);
+						}
+					}
+				}
+			}
+
+			return winMask;
+		}
+
+		function throwCoin(field, col, player) {
+			field = JSON.parse(JSON.stringify(field));
+			let amountInCol = field[col].filter(item => item > 0).length;
+
+			if (amountInCol > height - 1) {throw new Error('Col full')}
+
+			field[col][amountInCol] = player;
+
+			return field;
+		}
+
+		function checkWin(field, winMask, player) {
+			for (var i = 0; i < winMask.length; i++) {
+				let winRow = winMask[i];
+
+				for (var j = 0; j < winRow.length; j++) {
+					let coords = winRow[j];
+
+					if (field[coords.x][coords.y] != player) {break}
+
+					if (j == winLength - 1) {return true}
+				}
+			}
+
+			return false;
+		}
+
+		function buildPredictionTree(field, winMask, player, depth = searchDepth) {
+			let moves = [];
+
+			for (var i = 0; i < width; i++) {
+				try {
+					let newField = throwCoin(JSON.parse(JSON.stringify(field)), i, player);
+
+					moves.push(newField);
+				}catch{}
+			}
+
+			moves = moves.map(move => {
+				let p1Wins = checkWin(move, winMask, 1);
+				let p2Wins = checkWin(move, winMask, 2);
+
+				if (p1Wins) {return {p1Wins: 1, p2Wins: 0, und: 0}}
+				if (p2Wins) {return {p1Wins: 0, p2Wins: 1, und: 0}}
+				if (depth == 0) {return {p1Wins: 0, p2Wins: 0, und: 1}}
+
+				if (Array.isArray(move)) {
+					return buildPredictionTree(move, winMask, player == 1 ? 2 : 1, depth - 1);
+				}else {
+					return move;
+				}
+			});
+
+			return moves.reduce((acc, cur) => 
+				({
+					p1Wins: acc.p1Wins + cur.p1Wins,
+					p2Wins: acc.p2Wins + cur.p2Wins,
+					und: acc.und + cur.und
+				})
+			, {p1Wins: 0, p2Wins: 0, und: 0});
+		}
+
+		function test() {
+			let field = createField();
+			let winMask = createWinMask();
+
+			console.log(buildPredictionTree(field, winMask, 1));
+		}
+	</script>
+</body>
+</html>
