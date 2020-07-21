@@ -9,7 +9,7 @@
 
 		let width = 7;
 		let height = 6;
-		let winLength = 4;
+		let winLength = 3;
 		let winDirs = [
 			{x: 1, y: 0},
 			{x: 1, y: 1},
@@ -17,7 +17,11 @@
 			{x: -1, y: 1}
 		];
 
-		let searchDepth = 6;
+		let searchDepth = 7;
+
+		let stepCounter;
+		let p1PruneCounter;
+		let p2PruneCounter;
 
 		function createField() {
 			let field = new Array(width);
@@ -86,6 +90,7 @@
 		}
 
 		function buildPredictionTree(field, winMask, player, depth = searchDepth) {
+			stepCounter++;
 			let moves = [];
 
 			for (var i = 0; i < width; i++) {
@@ -107,6 +112,22 @@
 				if (p2Wins) {return {p1Wins: 0, p2Wins: 1, und: 0}}
 				if (depth == 0) {return {p1Wins: 0, p2Wins: 0, und: 1}}
 
+				return move;
+			});
+
+			let p1WinCount = moves.filter(move => !Array.isArray(move) && move.p1Wins == 1).length;
+			let p2WinCount = moves.filter(move => !Array.isArray(move) && move.p2Wins == 1).length;
+
+			if (player == 1 && p1WinCount >= 1) {
+				p1PruneCounter++;
+				return {p1Wins: 1, p2Wins: 0, und: 0}
+			}
+			if (player == 2 && p2WinCount >= 1) {
+				p2PruneCounter++;
+				return {p1Wins: 0, p2Wins: 1, und: 0}
+			}
+
+			moves = moves.map(move => {
 				if (Array.isArray(move)) {
 					return buildPredictionTree(move, winMask, player == 1 ? 2 : 1, depth - 1);
 				}else {
@@ -127,9 +148,14 @@
 			let field = createField();
 			let winMask = createWinMask();
 
+			stepCounter = 0;
+			p1PruneCounter = 0;
+			p2PruneCounter = 0;
+			
 			let startTime = (new Date()).getTime();
 			console.log(buildPredictionTree(field, winMask, 1));
-			console.log(((new Date()).getTime() - startTime) / 1000);
+			console.log("run-time:" + ((new Date()).getTime() - startTime) / 1000);
+			console.log(`steps:${stepCounter} p1-prunes:${p1PruneCounter} p2-prunes:${p2PruneCounter}`);
 		}
 	</script>
 </body>
