@@ -90,7 +90,10 @@
 
 			for (var i = 0; i < width; i++) {
 				try {
-					let newField = throwCoin(JSON.parse(JSON.stringify(field)), i, player);
+					let fieldClone = [];
+					field.forEach(col => fieldClone.push([...col]));
+
+					let newField = throwCoin(fieldClone, i, player);
 
 					moves.push(newField);
 				}catch{}
@@ -124,7 +127,9 @@
 			let field = createField();
 			let winMask = createWinMask();
 
+			let startTime = (new Date()).getTime();
 			console.log(buildPredictionTree(field, winMask, 1));
+			console.log(((new Date()).getTime() - startTime) / 1000);
 		}
 	</script>
 </body>
