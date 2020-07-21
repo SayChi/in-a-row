@@ -79,19 +79,21 @@
 		}
 
 		function checkWin(field, winMask, player) {
-			for (var i = 0; i < winMask.length; i++) {
-				let winRow = winMask[i];
+			let win = false;
 
+			winMask.forEach(winRow => {
 				for (var j = 0; j < winRow.length; j++) {
-					let coords = winRow[j];
+					let {x, y} = winRow[j];
 
-					if (field[coords.x][coords.y] != player) {break}
+					if (field[x][y] != player) {break}
 
-					if (j == winLength - 1) {return true}
+					if (j == winLength - 1) {
+						win = true;
+					}
 				}
-			}
+			});
 
-			return false;
+			return win;
 		}
 
 		function buildPredictionTree(field, winMask, player, depth = searchDepth) {
