@@ -66,14 +66,16 @@
 		}
 
 		function throwCoin(field, col, player) {
-			field = JSON.parse(JSON.stringify(field));
-			let amountInCol = field[col].filter(item => item > 0).length;
+			let fieldClone = [];
+			field.forEach(col => fieldClone.push([...col]));
+
+			let amountInCol = fieldClone[col].filter(item => item > 0).length;
 
 			if (amountInCol > height - 1) {throw new Error('Col full')}
 
-			field[col][amountInCol] = player;
+			fieldClone[col][amountInCol] = player;
 
-			return field;
+			return fieldClone;
 		}
 
 		function checkWin(field, winMask, player) {
