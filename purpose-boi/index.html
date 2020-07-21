@@ -100,18 +100,7 @@
 
 		function buildPredictionTree(field, winMask, player, depth = searchDepth) {
 			stepCounter++;
-			let moves = [];
-
-			for (var i = 0; i < width; i++) {
-				try {
-					let fieldClone = [];
-					field.forEach(col => fieldClone.push([...col]));
-
-					let newField = throwCoin(fieldClone, i, player);
-
-					moves.push(newField);
-				}catch{}
-			}
+			let moves = createNextMoveSet(field, player);
 
 			moves = moves.map(move => {
 				let cachedItem = getFromCache(move);
@@ -144,19 +133,19 @@
 
 			if (player == 1 && p1WinCount >= 1) {
 				p1PruneCounter++;
-				return {p1Wins: 1, p2Wins: 0, und: 0}
+				return {p1Wins: width, p2Wins: 0, und: 0}
 			}
 			if (player == 1 && p2WinCount >= 2) {
 				p1LossPruneCounter++;
-				return {p1Wins: 0, p2Wins: 1, und: 0}
+				return {p1Wins: 0, p2Wins: width, und: 0}
 			}
 			if (player == 2 && p2WinCount >= 1) {
 				p2PruneCounter++;
-				return {p1Wins: 0, p2Wins: 1, und: 0}
+				return {p1Wins: 0, p2Wins: width, und: 0}
 			}
 			if (player == 2 && p1WinCount >= 2) {
 				p2LossPruneCounter++;
-				return {p1Wins: 1, p2Wins: 0, und: 0}
+				return {p1Wins: width, p2Wins: 0, und: 0}
 			}
 
 			moves = moves.map(move => {
@@ -176,6 +165,25 @@
 			, {p1Wins: 0, p2Wins: 0, und: 0});
 			addToCache(field, result);
 			return result;
+		}
+
+		function createNextMoveSet(field, player, forceFill = false) {
+			let moves = [];
+
+			for (let i = 0; i < width; i++) {
+				try {
+					let fieldClone = [];
+					field.forEach(col => fieldClone.push([...col]));
+
+					let newField = throwCoin(fieldClone, i, player);
+
+					moves.push(newField);
+				}catch{
+					if (forceFill) {moves.push(null)}
+				}
+			}
+
+			return moves;
 		}
 
 		function createCacheKey(field) {
@@ -198,10 +206,65 @@
 			cache[key] = value;
 		}
 
-		function test() {
+		function startGame(p1Bot = false, p2Bot = true, depth = searchDepth) {
+			searchDepth = depth;
+
 			let field = createField();
 			let winMask = createWinMask();
 
+			displayField(field);
+
+			let p1Turn = true;
+			while(!(checkWin(field, winMask, 1) || checkWin(field, winMask, 2))) {
+				cache = {};
+				
+				if (p1Turn) {
+					if (p1Bot) {
+						let nextMoveSet = createNextMoveSet(field, 1, true);
+						let data = nextMoveSet.map(move => move ? buildPredictionTree(move, winMask, 2) : {p1Wins: 0, p2Wins: 9999999, und: 0});
+						let processed = data.map(item => item.p1Wins / (item.p1Wins + item.p2Wins + item.und));
+						let max = Math.max(...processed);
+						let col = processed.indexOf(max);
+						field = throwCoin(field, col, 1);
+					}else {
+						field = throwCoin(field, parseInt(window.prompt("What col?")), 1);
+					}
+				}else {
+					if (p2Bot) {
+						let nextMoveSet = createNextMoveSet(field, 2, true);
+						let data = nextMoveSet.map(move => move ? buildPredictionTree(move, winMask, 1) : {p1Wins: 9999999, p2Wins: 0, und: 0});
+						let processed = data.map(item => item.p2Wins / (item.p1Wins + item.p2Wins + item.und));
+						let max = Math.max(...processed);
+						let col = processed.indexOf(max);
+						field = throwCoin(field, col, 2);
+					}else {
+						field = throwCoin(field, parseInt(window.prompt("What col?")), 2);
+					}
+				}
+
+				p1Turn = !p1Turn;
+				displayField(field);
+			}
+		}
+
+		function displayField(field) {
+			for (let y = height - 1; y >= 0; y--) {
+				console.log("".concat(...field.map(col => col[y] + " ")) + "    " + y);
+			}
+
+			console.log("");
+			console.log("".concat(..."a".repeat(width).split("").map((item, index) => index + " ")));
+			console.log("");
+			console.log("");
+		}
+
+		function benchmark(depth = searchDepth) {
+			searchDepth = depth;
+
+			let field = createField();
+			let winMask = createWinMask();
+
+			cache = {};
 			stepCounter = 0;
 			p1PruneCounter = 0;
 			p2PruneCounter = 0;
@@ -210,24 +273,34 @@
 			cachePruneCounter = 0;
 
 			let startTime = (new Date()).getTime();
-			console.log(buildPredictionTree(field, winMask, 1));
-			console.log("run-time:" + ((new Date()).getTime() - startTime) / 1000);
-			console.log(`steps:${stepCounter}`);
-			console.log(`p1-prunes:${p1PruneCounter}`);
-			console.log(`p2-prunes:${p2PruneCounter}`);
-			console.log(`p1-loss-prunes:${p1LossPruneCounter}`);
-			console.log(`p2-loss-prunes:${p2LossPruneCounter}`);
-			console.log(`cache-prunes:${cachePruneCounter}`);
+			let data = buildPredictionTree(field, winMask, 1);
+			let endTime = (new Date()).getTime();
+
+			Object.assign(data, {
+				'run-time': (endTime - startTime) / 1000,
+				'steps': stepCounter,
+				'p1-prunes': p1PruneCounter,
+				'p2-prunes': p2PruneCounter,
+				'p1-loss-prunes': p1LossPruneCounter,
+				'p2-loss-prunes': p2LossPruneCounter,
+				'cache-prunes': cachePruneCounter,
+			});
+			
+			return data;
 		}
 
-		function depthTest() {
-			let depths = [1,2,3,4,5,6,7,8,9,10];
-			for(let depth of depths) {
-				searchDepth = depth;
-				cache = {};
-				console.log(`---- DEPTH SET TO ${depth} ----`);
-				test();
+		function depthBenchmark(maxDepth) {
+			let allData = [];
+
+			for(let depth = 1; depth <= maxDepth; depth++) {
+				console.log(`---- DEPTH TEST AT ${depth} ----`);
+				let data = benchmark(depth);
+				console.table(data);
+				allData[depth] = data;
 			}
+
+			console.log(`---- ALL ----`);
+			console.table(allData);
 		}
 	</script>
 </body>
