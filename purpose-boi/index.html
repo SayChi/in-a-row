@@ -100,18 +100,7 @@
 
 		function buildPredictionTree(field, winMask, player, depth = searchDepth) {
 			stepCounter++;
-			let moves = [];
-
-			for (var i = 0; i < width; i++) {
-				try {
-					let fieldClone = [];
-					field.forEach(col => fieldClone.push([...col]));
-
-					let newField = throwCoin(fieldClone, i, player);
-
-					moves.push(newField);
-				}catch{}
-			}
+			let moves = createNextMoveSet(field, player);
 
 			moves = moves.map(move => {
 				let cachedItem = getFromCache(move);
@@ -176,6 +165,25 @@
 			, {p1Wins: 0, p2Wins: 0, und: 0});
 			addToCache(field, result);
 			return result;
+		}
+
+		function createNextMoveSet(field, player, forceFill = false) {
+			let moves = [];
+
+			for (let i = 0; i < width; i++) {
+				try {
+					let fieldClone = [];
+					field.forEach(col => fieldClone.push([...col]));
+
+					let newField = throwCoin(fieldClone, i, player);
+
+					moves.push(newField);
+				}catch{
+					if (forceFill) {moves.push(null)}
+				}
+			}
+
+			return moves;
 		}
 
 		function createCacheKey(field) {
