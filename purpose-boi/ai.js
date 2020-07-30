@@ -18,18 +18,13 @@ class AI {
 			field: move,
 			player: player == 1 ? 2 : 1,
 			depth: depth - 1,
-			cache,
+			cache: cache.cache,
 			winMask: this.winMask
 		}));
 		let workerResults = await Promise.all(promises);
 		let results = workerResults.map(data => data.result);
 
-		// workerResults.forEach(data => {
-		// 	let keys = Object.keys(data.cache.cache);
-		// 	for (let key in keys) {
-		// 		cache.addToCache(key, data.cache.cache[key]);
-		// 	}
-		// });
+		workerResults.forEach(data => Object.assign(cache.cache, data.cache));
 
 		return results;
 	}
