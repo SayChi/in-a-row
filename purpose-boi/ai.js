@@ -14,6 +14,7 @@ class AI {
 		let moves = Util.createNextMoveSet(field, player);
 
 		let cache = new Cache();
+		let counters = new Counters();
 		let promises = moves.map(move => Util.runWorker({
 			field: move,
 			player: player == 1 ? 2 : 1,
@@ -24,7 +25,10 @@ class AI {
 		let workerResults = await Promise.all(promises);
 		let results = workerResults.map(data => data.result);
 
-		workerResults.forEach(data => Object.assign(cache.cache, data.cache));
+		workerResults.forEach(data => {
+			Object.assign(cache.cache, data.cache);
+			Object.keys(data.counters).forEach(counterKey => counters[counterKey] += data.counters[counterKey])
+		});
 
 		return results;
 	}

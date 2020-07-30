@@ -19,6 +19,17 @@ class Counters {
 		this.p2LossPruneCounter = 0;
 		this.cachePruneCounter = 0;
 	}
+
+	getAll() {
+		return {
+			stepCounter: this.stepCounter,
+			p1PruneCounter: this.p1PruneCounter,
+			p2PruneCounter: this.p2PruneCounter,
+			p1LossPruneCounter: this.p1LossPruneCounter,
+			p2LossPruneCounter: this.p2LossPruneCounter,
+			cachePruneCounter: this.cachePruneCounter,
+		}
+	}
 }
 
 module.exports = Counters;
