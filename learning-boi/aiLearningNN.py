@@ -23,7 +23,7 @@ class Neural_Network(nn.Module):
 		self.hiddenLayerSize = 1
 		self.learningRate = 1e-3
 
-        #weights
+        #weights met de hand aanpassen..
 		self.W1 = torch.randn(self.inputSize, self.hiddenSize)
 		self.W2 = torch.randn(self.hiddenSize, self.outputSize)
 
@@ -65,7 +65,7 @@ class Neural_Network(nn.Module):
 				for z in range(len(weightsL[i][j])):
 					val = (numpy.random.randint(-1000, 1000, size=1)/1000)*self.learningRate
 					leaf = branch[z]
-					getattr(self, 'W'+str(i+1))[j][z] = weightsL[i][j][z] + val	
+					getattr(self, 'W'+str(i+1))[j][z] = weightsL[i][j][z] +val
 
 
 
@@ -80,8 +80,8 @@ def evolutionFunc():
 
 	if (len(listOfSurvivors)) > 0:
 		for i in range (len(listOfLosers)):
-			 whoIsYourDady = numpy.random.randint((len(listOfSurvivors)+1), size=1)
-			 list_objects[i].weightAdjust(list_objects[int(whoIsYourDady)].weightListV())
+			 whoIsYourDady = numpy.random.randint((len(listOfSurvivors)), size=1)
+			 list_objects[i].weightAdjust(list_objects[listOfSurvivors[int(whoIsYourDady)]].weightListV())
 	else :
 		print('no one won.. so create new set')
 		for i in range (amountOfNeuralNetwork):
@@ -99,7 +99,7 @@ for i in range (amountOfNeuralNetwork):
 
 print (len(list_objects))
 
-#list_objects[1].predict()
+
 print (list_objects[0].weightListV())
 print('')
 print (list_objects[1].weightListV())
@@ -113,7 +113,6 @@ evolutionFunc()
 print (list_objects[0].weightListV())
 print('')
 
-resetWin()
 
 
 
