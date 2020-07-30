@@ -7,12 +7,12 @@ class DepthBenchmark {
 		this.maxDepth = maxDepth;
 	}
 
-	run() {
+	async run(multithreaded = true) {
 		let allData = [];
 
 		for(let depth = 1; depth <= this.maxDepth; depth++) {
 			console.log(`---- DEPTH TEST AT ${depth} ----`);
-			let data = new Benchmark(depth).run();
+			let data = await new Benchmark(depth).run(multithreaded);
 			console.table(data);
 			allData[depth] = data;
 		}
