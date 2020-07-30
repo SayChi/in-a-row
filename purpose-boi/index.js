@@ -1,16 +1,6 @@
 'use strict';
 
-let searchDepth = 8;
-let width = 7;
-let height = 6;
-let winLength = 4;
-let winDirs = [
-	{x: 1, y: 0},
-	{x: 1, y: 1},
-	{x: 0, y: 1},
-	{x: -1, y: 1}
-];
-let useCache = true;
+let S = require('./settings.js');
 
 let cache = {};
 
@@ -22,8 +12,8 @@ let p2LossPruneCounter;
 let cachePruneCounter;
 
 function createField() {
-	let field = new Array(width);
-	field.fill(new Array(height));
+	let field = new Array(S.width);
+	field.fill(new Array(S.height));
 	field.map(row => row.fill(0));
 
 	return field;
@@ -32,25 +22,25 @@ function createField() {
 function createWinMask() {
 	let winMask = [];
 
-	for (var x = 0; x < width; x++) {
-		for (var y = 0; y < height; y++) {
-			for (var i = 0; i < winDirs.length; i++) {
-				let winDir = winDirs[i];
+	for (var x = 0; x < S.width; x++) {
+		for (var y = 0; y < S.height; y++) {
+			for (var i = 0; i < S.winDirs.length; i++) {
+				let winDir = S.winDirs[i];
 				let winRow = [];
 
-				for (var d = 0; d < winLength; d++) {
+				for (var d = 0; d < S.winLength; d++) {
 					let dx = d * winDir.x;
 					let dy = d * winDir.y;
 
 					let x2 = x + dx;
 					let y2 = y + dy;
 
-					if (0 > x2 || x2 > width - 1 || 0 > y2 || y2 > height - 1) {break;}
+					if (0 > x2 || x2 > S.width - 1 || 0 > y2 || y2 > S.height - 1) {break;}
 
 					winRow.push({x: x2, y: y2});
 				}
 
-				if (winRow.length == winLength) {
+				if (winRow.length == S.winLength) {
 					winMask.push(winRow);
 				}
 			}
@@ -66,7 +56,7 @@ function throwCoin(field, col, player) {
 
 	let amountInCol = fieldClone[col].filter(item => item > 0).length;
 
-	if (amountInCol > height - 1) {throw new Error('Col full')}
+	if (amountInCol > S.height - 1) {throw new Error('Col full')}
 
 	fieldClone[col][amountInCol] = player;
 
@@ -82,7 +72,7 @@ function checkWin(field, winMask, player) {
 
 			if (field[x][y] != player) {break}
 
-			if (j == winLength - 1) {
+			if (j == S.winLength - 1) {
 				win = true;
 			}
 		}
@@ -91,7 +81,7 @@ function checkWin(field, winMask, player) {
 	return win;
 }
 
-function buildPredictionTree(field, winMask, player, depth = searchDepth) {
+function buildPredictionTree(field, winMask, player, depth = S.searchDepth) {
 	stepCounter++;
 	let moves = createNextMoveSet(field, player);
 
@@ -126,19 +116,19 @@ function buildPredictionTree(field, winMask, player, depth = searchDepth) {
 
 	if (player == 1 && p1WinCount >= 1) {
 		p1PruneCounter++;
-		return {p1Wins: width, p2Wins: 0, und: 0}
+		return {p1Wins: S.width, p2Wins: 0, und: 0}
 	}
 	if (player == 1 && p2WinCount >= 2) {
 		p1LossPruneCounter++;
-		return {p1Wins: 0, p2Wins: width, und: 0}
+		return {p1Wins: 0, p2Wins: S.width, und: 0}
 	}
 	if (player == 2 && p2WinCount >= 1) {
 		p2PruneCounter++;
-		return {p1Wins: 0, p2Wins: width, und: 0}
+		return {p1Wins: 0, p2Wins: S.width, und: 0}
 	}
 	if (player == 2 && p1WinCount >= 2) {
 		p2LossPruneCounter++;
-		return {p1Wins: width, p2Wins: 0, und: 0}
+		return {p1Wins: S.width, p2Wins: 0, und: 0}
 	}
 
 	moves = moves.map(move => {
@@ -163,7 +153,7 @@ function buildPredictionTree(field, winMask, player, depth = searchDepth) {
 function createNextMoveSet(field, player, forceFill = false) {
 	let moves = [];
 
-	for (let i = 0; i < width; i++) {
+	for (let i = 0; i < S.width; i++) {
 		try {
 			let fieldClone = [];
 			field.forEach(col => fieldClone.push([...col]));
@@ -184,7 +174,7 @@ function createCacheKey(field) {
 }
 
 function getFromCache(field) {
-	if (!useCache) {return undefined}
+	if (!S.useCache) {return undefined}
 
 	let key = createCacheKey(field);
 
@@ -192,15 +182,15 @@ function getFromCache(field) {
 }
 
 function addToCache(field, value) {
-	if (!useCache) {return}
+	if (!S.useCache) {return}
 
 	let key = createCacheKey(field);
 
 	cache[key] = value;
 }
 
-function startGame(p1Bot = false, p2Bot = true, depth = searchDepth) {
-	searchDepth = depth;
+function startGame(p1Bot = false, p2Bot = true, depth = S.searchDepth) {
+	S.searchDepth = depth;
 
 	let field = createField();
 	let winMask = createWinMask();
@@ -241,18 +231,18 @@ function startGame(p1Bot = false, p2Bot = true, depth = searchDepth) {
 }
 
 function displayField(field) {
-	for (let y = height - 1; y >= 0; y--) {
+	for (let y = S.height - 1; y >= 0; y--) {
 		console.log("".concat(...field.map(col => col[y] + " ")) + "    " + y);
 	}
 
 	console.log("");
-	console.log("".concat(..."a".repeat(width).split("").map((item, index) => index + " ")));
+	console.log("".concat(..."a".repeat(S.width).split("").map((item, index) => index + " ")));
 	console.log("");
 	console.log("");
 }
 
-function benchmark(depth = searchDepth) {
-	searchDepth = depth;
+function benchmark(depth = S.searchDepth) {
+	S.searchDepth = depth;
 
 	let field = createField();
 	let winMask = createWinMask();
