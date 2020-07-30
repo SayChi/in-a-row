@@ -5,6 +5,8 @@ import torch.nn as nn
 #inp = torch.tensor(([2,9],[1,5],[3,6]), dtype=torch.float) #3x2 tensor
 #out = torch.tensor(([92],[100],[89]),dtype=torch.float) #3x1 tensor
 
+amountOfNeuralNetwork = 100
+
 toPredict = torch.tensor(([4,8]), dtype=torch.float) #1x2 tensor
 
 class Neural_Network(nn.Module):
@@ -43,5 +45,13 @@ class Neural_Network(nn.Module):
 	def predict(self):
 		print("predicted : " + str(self.forward(toPredict)))
 
-NN = Neural_Network()
-NN.predict()
+list_objects = []
+
+for i in range (amountOfNeuralNetwork):
+	list_objects.append(Neural_Network())
+
+print (len(list_objects))
+
+list_objects[1].predict()
+
+
