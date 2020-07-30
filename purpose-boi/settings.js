@@ -1,5 +1,4 @@
 module.exports = {
-	searchDepth: 8,
 	width: 7,
 	height: 6,
 	winLength: 4,
