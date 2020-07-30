@@ -2,4 +2,4 @@
 
 let DepthBenchmark = require('./depth-benchmark.js');
 
-new DepthBenchmark(10).run();
+new DepthBenchmark(8).run();

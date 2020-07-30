@@ -12,7 +12,6 @@ class AI {
 	}
 
 	buildPredictionTree(field, player, depth) {
-
 		let cache = new Cache();
 		let counters = new Counters();
 
@@ -26,8 +25,8 @@ class AI {
 				return cachedItem;
 			}
 
-			let p1Wins = Game.checkWin(move, this.winMask, 1);
-			let p2Wins = Game.checkWin(move, this.winMask, 2);
+			let p1Wins = Util.checkWin(move, this.winMask, 1);
+			let p2Wins = Util.checkWin(move, this.winMask, 2);
 
 			if (p1Wins) {
 				cache.addToCache(move, {p1Wins: 1, p2Wins: 0, und: 0});

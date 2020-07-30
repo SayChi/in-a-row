@@ -3,6 +3,7 @@
 let S = require('./settings.js');
 let Game = require('./game.js');
 let Cache = require('./cache.js');
+let readline = require('readline');
 
 class Util {
 	static createNextMoveSet(field, player, forceFill = false) {
@@ -33,6 +34,36 @@ class Util {
 		console.log("".concat(..."a".repeat(S.width).split("").map((item, index) => index + " ")));
 		console.log("");
 		console.log("");
+	}
+
+	static consoleQuestion(q) {
+		let rl = readline.createInterface({
+			input: process.stdin,
+			output: process.stdout,
+		});
+
+		return new Promise(resolve => rl.question(q, ans => {
+			rl.close();
+			resolve(ans);
+		}));
+	}
+
+	static checkWin(field, winMask, player) {
+		let win = false;
+
+		winMask.forEach(winRow => {
+			for (var j = 0; j < winRow.length; j++) {
+				let {x, y} = winRow[j];
+
+				if (field[x][y] != player) {break}
+
+				if (j == S.winLength - 1) {
+					win = true;
+				}
+			}
+		});
+
+		return win;
 	}
 }
 

@@ -2,6 +2,8 @@
 
 let S = require('./settings.js');
 let Util = require('./util.js');
+let Cache = require('./cache.js');
+let AI = require('./ai.js');
 
 class Game {
 	constructor(depth, p1Bot, p2Bot) {
@@ -68,60 +70,44 @@ class Game {
 		return fieldClone;
 	}
 
-	static checkWin(field, winMask, player) {
-		let win = false;
-
-		winMask.forEach(winRow => {
-			for (var j = 0; j < winRow.length; j++) {
-				let {x, y} = winRow[j];
-
-				if (field[x][y] != player) {break}
-
-				if (j == S.winLength - 1) {
-					win = true;
-				}
-			}
-		});
-
-		return win;
-	}
-
-	play(p1Bot = this.p1Bot, p2Bot = this.p2Bot, depth = this.depth) {
-		let field = Game.createField();
-		let winMask = Game.createWinMask();
+	async play(p1Bot = this.p1Bot, p2Bot = this.p2Bot, depth = this.depth) {
+		let field = this.constructor.createField();
+		let winMask = this.constructor.createWinMask();
 
 		Util.displayField(field);
 
 		let p1Turn = true;
-		while(!(Game.checkWin(field, winMask, 1) || Game.checkWin(field, winMask, 2))) {
+		while(!(Util.checkWin(field, winMask, 1) || Util.checkWin(field, winMask, 2))) {
 			new Cache().clearCache();
 			
 			if (p1Turn) {
 				if (p1Bot) {
 					let nextMoveSet = Util.createNextMoveSet(field, 1, true);
-					let data = nextMoveSet.map(move => move ? buildPredictionTree(move, winMask, 2) : {p1Wins: 0, p2Wins: 9999999, und: 0});
+					let data = nextMoveSet.map(move => move ? new AI(winMask).buildPredictionTree(move, 2, depth) : {p1Wins: 0, p2Wins: 9999999, und: 0});
 					let processed = data.map(item => item.p1Wins / (item.p1Wins + item.p2Wins + item.und));
 					let max = Math.max(...processed);
 					let col = processed.indexOf(max);
-					field = Game.throwCoin(field, col, 1);
+					field = this.constructor.throwCoin(field, col, 1);
 				}else {
-					field = Game.throwCoin(field, parseInt(window.prompt("What col?")), 1);
+					let col = await Util.consoleQuestion("What col?\n").catch(console.log);
+					field = this.constructor.throwCoin(field, parseInt(col), 1);
 				}
 			}else {
 				if (p2Bot) {
 					let nextMoveSet = Util.createNextMoveSet(field, 2, true);
-					let data = nextMoveSet.map(move => move ? buildPredictionTree(move, winMask, 1) : {p1Wins: 9999999, p2Wins: 0, und: 0});
+					let data = nextMoveSet.map(move => move ? new AI(winMask).buildPredictionTree(move, 1, depth) : {p1Wins: 9999999, p2Wins: 0, und: 0});
 					let processed = data.map(item => item.p2Wins / (item.p1Wins + item.p2Wins + item.und));
 					let max = Math.max(...processed);
 					let col = processed.indexOf(max);
-					field = Game.throwCoin(field, col, 2);
+					field = this.constructor.throwCoin(field, col, 2);
 				}else {
-					field = Game.throwCoin(field, parseInt(window.prompt("What col?")), 2);
+					let col = await Util.consoleQuestion("What col?\n").catch(console.log);
+					field = this.constructor.throwCoin(field, parseInt(col), 2);
 				}
 			}
 
 			p1Turn = !p1Turn;
-			Game.displayField(field);
+			Util.displayField(field);
 		}
 	}
 }
