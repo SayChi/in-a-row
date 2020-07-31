@@ -62,7 +62,7 @@ class Game {
 
 		let amountInCol = fieldClone[col].filter(item => item > 0).length;
 
-		if (amountInCol > S.height - 1) {throw new Error('Col full')}
+		if (amountInCol > field[0].length - 1) {throw new Error('Col full')}
 
 		fieldClone[col][amountInCol] = player;
 
