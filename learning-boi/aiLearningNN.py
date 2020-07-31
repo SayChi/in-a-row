@@ -11,7 +11,7 @@ batchSize = 500
 
 
 #ask for the right settings:
-print('field settings + playaaah?')
+#print('field settings + playaaah?')
 ans = input('field_x: ,  field_y,  howManyOnARow, player1?')
 x = ans.split(",")
 
@@ -21,9 +21,6 @@ inputSize = int(x[0]) * int(x[1])
 winCond = int(x[2])
 playerOne = int(x[3])
 
-print(inputSize)
-print(winCond)
-print(playerOne)
 
 #toPredict = torch.tensor(([4,8]), dtype=torch.float) #1x2 tensor
 
@@ -70,10 +67,10 @@ class Neural_Network(nn.Module):
 		#not needed in our case.
 
 	def predict(self):
-		print("predictTensor")
-		print(toPredict)
-		print('')
-		print("predicted : " + str(self.forward(toPredict)))
+		#print("predictTensor")
+		#print(toPredict)
+		#print('')
+		#print("predicted : " + str(self.forward(toPredict)))
 		return self.forward(toPredict)
 
 	def weightListV(self):
@@ -109,7 +106,7 @@ def evolutionFunc(numbOfEvolve):
 			 whoIsYourDady = numpy.random.randint((len(listOfSurvivors)), size=1)
 			 list_objects[i].weightAdjust(list_objects[listOfSurvivors[int(whoIsYourDady)]].weightListV())
 	else :
-		print('no one won.. so create new set')
+		#print('no one won.. so create new set')
 		for i in range (amountOfNeuralNetwork):
 			list_objects[i] = (Neural_Network())
 			resetWin()
@@ -139,7 +136,7 @@ def obtainFieldInformation(i):
     #watch out this is hardcoded part - prone to fail..
 	global toPredict
 	toPredict = torch.tensor(([float(tensorToPredict[0]),float(tensorToPredict[1]),float(tensorToPredict[2]),float(tensorToPredict[3]),float(tensorToPredict[4]),float(tensorToPredict[5]),float(tensorToPredict[6]),float(tensorToPredict[7]),float(tensorToPredict[8]),float(tensorToPredict[9]),float(tensorToPredict[10]),float(tensorToPredict[11]),float(tensorToPredict[12]),float(tensorToPredict[13]),float(tensorToPredict[14]),float(tensorToPredict[15]),float(tensorToPredict[16]),float(tensorToPredict[17]),float(tensorToPredict[18]),float(tensorToPredict[19]),float(tensorToPredict[20]),float(tensorToPredict[21]),float(tensorToPredict[22]),float(tensorToPredict[23]),float(tensorToPredict[24]),float(tensorToPredict[25]),float(tensorToPredict[26]),float(tensorToPredict[27]),float(tensorToPredict[28]),float(tensorToPredict[29]),float(tensorToPredict[30]),float(tensorToPredict[31]),float(tensorToPredict[32]),float(tensorToPredict[33]),float(tensorToPredict[34]),float(tensorToPredict[35]),float(tensorToPredict[36]),float(tensorToPredict[37]),float(tensorToPredict[38]),float(tensorToPredict[39]),float(tensorToPredict[40]),float(tensorToPredict[41])]), dtype=torch.float)
-	print(toPredict)
+	#print(toPredict)
     
 	playing = int(txt[2])
 	mateOrNot = int(txt[1])
@@ -156,8 +153,8 @@ def neuralNetworkMovement(whichNN):
 		if ans[j] > highestNumb:
 			counter = j+1
 			highestNumb = ans[j]
-	print('Row-> ' + str(counter))
-	print('')
+	print(str(counter))
+	#print('')
 
 
 def toMateOrNotToMate(whichNN, ans):
@@ -173,9 +170,7 @@ def writeInfoToFile(numb, evolution):
 for j in range(batchSize):	
 	for i in range (amountOfNeuralNetwork):
 		#provide info
-		print('---------------------------------')
-		print(str(i) + '. time for a new neuralNetwork')
-		print('')
+
 
 		while(1):
 			#ask field information + still playing
