@@ -5,7 +5,24 @@ import torch.nn as nn
 #inp = torch.tensor(([2,9],[1,5],[3,6]), dtype=torch.float) #3x2 tensor
 #out = torch.tensor(([92],[100],[89]),dtype=torch.float) #3x1 tensor
 
-amountOfNeuralNetwork = 1
+#changeable parameters
+amountOfNeuralNetwork = 10
+batchSize = 1
+
+
+#ask for the right settings:
+print('field settings + playaaah?')
+ans = input('field_x: ,  field_y,  howManyOnARow, player1?')
+x = ans.split(",")
+
+#Process the right information.
+inputSize = int(x[0]) * int(x[1])
+winCond = int(x[2])
+playerOne = int(x[3])
+
+print(inputSize)
+print(winCond)
+print(playerOne)
 
 toPredict = torch.tensor(([4,8]), dtype=torch.float) #1x2 tensor
 
@@ -19,7 +36,7 @@ class Neural_Network(nn.Module):
 		#change parameters
 		self.inputSize  = 2
 		self.outputSize = 6
-		self.hiddenSize = 4
+		self.hiddenSize = 10
 		self.hiddenLayerSize = 2
 		self.learningRate = 1e-3
 
@@ -93,6 +110,7 @@ def evolutionFunc():
 			list_objects[i] = (Neural_Network())
 			resetWin()
 
+
 def resetWin():
 	for i in range (amountOfNeuralNetwork):
 		lifeOrDie[i] = 0
@@ -103,44 +121,74 @@ for i in range (amountOfNeuralNetwork):
 	lifeOrDie.append(0)
 
 
-for i in range (amountOfNeuralNetwork):
-	playing = 1
-	while(playing):
-		highestNumb = -1
-		counter = -1
-		ans = list_objects[i].predict()
-		for j in range (len(ans)):
-			if ans[j] > highestNumb:
-				counter = j+1
-				highestNumb = ans[j]
-		print('this row we gonna put the ball in --------------->   ' + str(counter))
-        
-		#verwerk reactie
-		answer = numpy.random.randint(0, 10, size=1)
-		print(answer)
-		if answer > 5:
-			playing = 0
-		else:
-			fistAns = numpy.random.randint(0, 10, size=1)
-			secondAns = numpy.random.randint(0, 10, size=1)
-			toPredict = torch.tensor(([1,0]), dtype=torch.float)
+
+
+#global parameters
+tensorToPredict = []
+stillPlayingJS = 0
+mateOrNot = 0
+def obtainFieldInformation():
+	fieldInfo = input("fieldInput; didIWin; stillPlaying_?")
+	txt = fieldInfo.split(";")
+	tensorToPredict = txt[0].split(",")
+
+	#WATCHOUT NOW IT IS HARDCODED TO BE A TENSOR OF 2D!
+	tensorToPredict = torch.tensor(([float(tensorToPredict[0]),float(tensorToPredict[1])]), dtype=torch.float)
+	stillPlayingJS = txt[2]
+	didIWin = txt[1]
+
+
+def neuralNetworkMovement(whichNN):
+	highestNumb = -1
+	counter = -1
+	ans = list_objects[whichNN].predict()
+	for j in range (len(ans)):
+		if ans[j] > highestNumb:
+			counter = j+1
+			highestNumb = ans[j]
+	print('Row-> ' + str(counter))
+	print('your turn ;)')
+	print('')
+
+
+def toMateOrNotToMate(whichNN):
+	lifeOrDie[whichNN] = mateOrNot
+
+
+def writeInfoToFile(numb):
+	f = open("weightsFile.txt", "a")
+	f.write(str(numb) + str(' here we can provide some updates to the file if needed.'))
+	f.close()
+
+#play actions
+for j in range(batchSize):	
+	for i in range (amountOfNeuralNetwork):
+		playing = 1
+		while(playing):
+			#ask field information + still playing
+			obtainFieldInformation()
+
+			#check if we are still playing.
+			playing = stillPlayingJS
+
+			#create movement for the current neural network
+			neuralNetworkMovement(i)
+
+			#save or regard the neuralNetwork
+			toMateOrNotToMate(i)
+
+	#Mega Evolve and save the best weights per evolution in file.
+	writeInfoToFile(j)
+
+	#evolve
+	evolutionFunc()
+
+	#restart process
+
+
 
  
-#print (len(list_objects))
 
-#Debug purposes
-#print (list_objects[0].weightListV())
-#print('')
-#print (list_objects[1].weightListV())
-#print('')
-#(list_objects[0].weightAdjust(list_objects[1].weightListV()))
-#print (list_objects[0].weightListV())
-#print('')
-
-#lifeOrDie[1] = 1
-#evolutionFunc()
-#print (list_objects[0].weightListV())
-#print('')
 
 
 
