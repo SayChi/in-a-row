@@ -2,7 +2,6 @@
 
 let S = require('./settings.js');
 let Util = require('./util.js');
-let Cache = require('./cache.js');
 let AI = require('./ai.js');
 
 class Game {
@@ -78,13 +77,10 @@ class Game {
 
 		let p1Turn = true;
 		while(!(Util.checkWin(field, winMask, 1) || Util.checkWin(field, winMask, 2))) {
-			new Cache().clearCache();
-			
 			if (p1Turn) {
 				if (p1Bot) {
-					let nextMoveSet = Util.createNextMoveSet(field, 1, true);
-					let data = nextMoveSet.map(move => move ? new AI(winMask).buildPredictionTree(move, 2, depth) : {p1Wins: 0, p2Wins: 9999999, und: 0});
-					let processed = data.map(item => item.p1Wins / (item.p1Wins + item.p2Wins + item.und));
+					let data = (await new AI(winMask).start(field, 1, depth)).map(result => result ? result : {p1Wins: 0, p2Wins: 9999999, und: 0});
+					let processed = data.map(item => item.p1Wins + item.p2Wins + item.und > 0 ? item.p1Wins / (item.p1Wins + item.p2Wins + item.und) : -999999);
 					let max = Math.max(...processed);
 					let col = processed.indexOf(max);
 					field = this.constructor.throwCoin(field, col, 1);
@@ -94,9 +90,8 @@ class Game {
 				}
 			}else {
 				if (p2Bot) {
-					let nextMoveSet = Util.createNextMoveSet(field, 2, true);
-					let data = nextMoveSet.map(move => move ? new AI(winMask).buildPredictionTree(move, 1, depth) : {p1Wins: 9999999, p2Wins: 0, und: 0});
-					let processed = data.map(item => item.p2Wins / (item.p1Wins + item.p2Wins + item.und));
+					let data = (await new AI(winMask).start(field, 2, depth)).map(result => result ? result : {p1Wins: 9999999, p2Wins: 0, und: 0});
+					let processed = data.map(item => item.p1Wins + item.p2Wins + item.und > 0 ? item.p2Wins / (item.p1Wins + item.p2Wins + item.und) : -999999);
 					let max = Math.max(...processed);
 					let col = processed.indexOf(max);
 					field = this.constructor.throwCoin(field, col, 2);

@@ -13,6 +13,8 @@ class Cache {
 	}
 
 	static createCacheKey(field) {
+		if (!field) {return}
+		
 		return "".concat(...field.map(col => "".concat(...col)));
 	}
 

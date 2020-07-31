@@ -11,10 +11,12 @@ class AI {
 	}
 
 	async start(field, player, depth) {
-		let moves = Util.createNextMoveSet(field, player);
+		let moves = Util.createNextMoveSet(field, player, true);
 
 		let cache = new Cache();
 		let counters = new Counters();
+		cache.clearCache();
+		
 		let promises = moves.map(move => Util.runWorker({
 			field: move,
 			player: player == 1 ? 2 : 1,
