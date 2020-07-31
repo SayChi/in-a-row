@@ -6,8 +6,8 @@ import torch.nn as nn
 #out = torch.tensor(([92],[100],[89]),dtype=torch.float) #3x1 tensor
 
 #changeable parameters
-amountOfNeuralNetwork = 10
-batchSize = 1
+amountOfNeuralNetwork = 2
+batchSize = 2
 
 
 #ask for the right settings:
@@ -16,6 +16,7 @@ ans = input('field_x: ,  field_y,  howManyOnARow, player1?')
 x = ans.split(",")
 
 #Process the right information.
+outputSize = int(x[0])
 inputSize = int(x[0]) * int(x[1])
 winCond = int(x[2])
 playerOne = int(x[3])
@@ -24,7 +25,7 @@ print(inputSize)
 print(winCond)
 print(playerOne)
 
-toPredict = torch.tensor(([4,8]), dtype=torch.float) #1x2 tensor
+#toPredict = torch.tensor(([4,8]), dtype=torch.float) #1x2 tensor
 
 list_objects = []
 lifeOrDie = []
@@ -34,9 +35,9 @@ class Neural_Network(nn.Module):
 		super(Neural_Network, self).__init__()
 
 		#change parameters
-		self.inputSize  = 2
-		self.outputSize = 6
-		self.hiddenSize = 10
+		self.inputSize  = inputSize
+		self.outputSize = outputSize
+		self.hiddenSize = 100
 		self.hiddenLayerSize = 2
 		self.learningRate = 1e-3
 
@@ -69,6 +70,9 @@ class Neural_Network(nn.Module):
 		#not needed in our case.
 
 	def predict(self):
+		print("predictTensor")
+		print(toPredict)
+		print('')
 		print("predicted : " + str(self.forward(toPredict)))
 		return self.forward(toPredict)
 
@@ -124,18 +128,24 @@ for i in range (amountOfNeuralNetwork):
 
 
 #global parameters
-tensorToPredict = []
-stillPlayingJS = 0
+toPredict = torch.tensor([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], dtype=torch.float)
+playing =0
 mateOrNot = 0
-def obtainFieldInformation():
+def obtainFieldInformation(i):
 	fieldInfo = input("fieldInput; didIWin; stillPlaying_?")
 	txt = fieldInfo.split(";")
 	tensorToPredict = txt[0].split(",")
+  
+    #watch out this is hardcoded part - prone to fail..
+	global toPredict
+	toPredict = torch.tensor(([float(tensorToPredict[0]),float(tensorToPredict[1]),float(tensorToPredict[2]),float(tensorToPredict[3]),float(tensorToPredict[4]),float(tensorToPredict[5]),float(tensorToPredict[6]),float(tensorToPredict[7]),float(tensorToPredict[8]),float(tensorToPredict[9]),float(tensorToPredict[10]),float(tensorToPredict[11]),float(tensorToPredict[12]),float(tensorToPredict[13]),float(tensorToPredict[14]),float(tensorToPredict[15]),float(tensorToPredict[16]),float(tensorToPredict[17]),float(tensorToPredict[18]),float(tensorToPredict[19]),float(tensorToPredict[20]),float(tensorToPredict[21]),float(tensorToPredict[22]),float(tensorToPredict[23]),float(tensorToPredict[24]),float(tensorToPredict[25]),float(tensorToPredict[26]),float(tensorToPredict[27]),float(tensorToPredict[28]),float(tensorToPredict[29]),float(tensorToPredict[30]),float(tensorToPredict[31]),float(tensorToPredict[32]),float(tensorToPredict[33]),float(tensorToPredict[34]),float(tensorToPredict[35]),float(tensorToPredict[36]),float(tensorToPredict[37]),float(tensorToPredict[38]),float(tensorToPredict[39]),float(tensorToPredict[40]),float(tensorToPredict[41])]), dtype=torch.float)
+	print(toPredict)
+    
+	playing = int(txt[2])
+	mateOrNot = int(txt[1])
 
-	#WATCHOUT NOW IT IS HARDCODED TO BE A TENSOR OF 2D!
-	tensorToPredict = torch.tensor(([float(tensorToPredict[0]),float(tensorToPredict[1])]), dtype=torch.float)
-	stillPlayingJS = txt[2]
-	didIWin = txt[1]
+	toMateOrNotToMate(i, mateOrNot)
+	return int(txt[2])-1
 
 
 def neuralNetworkMovement(whichNN):
@@ -147,44 +157,50 @@ def neuralNetworkMovement(whichNN):
 			counter = j+1
 			highestNumb = ans[j]
 	print('Row-> ' + str(counter))
-	print('your turn ;)')
 	print('')
 
 
-def toMateOrNotToMate(whichNN):
-	lifeOrDie[whichNN] = mateOrNot
-
+def toMateOrNotToMate(whichNN, ans):
+	lifeOrDie[whichNN] = ans
 
 def writeInfoToFile(numb):
 	f = open("weightsFile.txt", "a")
-	f.write(str(numb) + str(' here we can provide some updates to the file if needed.'))
+	f.write(str(numb) + str(' here we can provide some updates to the file if needed.') +str('\n'))
 	f.close()
+
 
 #play actions
 for j in range(batchSize):	
 	for i in range (amountOfNeuralNetwork):
-		playing = 1
-		while(playing):
-			#ask field information + still playing
-			obtainFieldInformation()
+		#provide info
+		print('---------------------------------')
+		print(str(i) + '. time for a new neuralNetwork')
+		print('')
 
+		while(1):
+			#ask field information + still playing
+			
+           
 			#check if we are still playing.
-			playing = stillPlayingJS
+			#does obtainFielInformation
+			if(obtainFieldInformation(i)):
+				break
 
 			#create movement for the current neural network
 			neuralNetworkMovement(i)
 
-			#save or regard the neuralNetwork
-			toMateOrNotToMate(i)
+
 
 	#Mega Evolve and save the best weights per evolution in file.
 	writeInfoToFile(j)
-
+	
+	#print('evolve')
 	#evolve
 	evolutionFunc()
-
 	#restart process
 
+
+print('done with everything.')
 
 
  
