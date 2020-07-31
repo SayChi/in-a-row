@@ -6,8 +6,8 @@ import torch.nn as nn
 #out = torch.tensor(([92],[100],[89]),dtype=torch.float) #3x1 tensor
 
 #changeable parameters
-amountOfNeuralNetwork = 2
-batchSize = 2
+amountOfNeuralNetwork = 100
+batchSize = 500
 
 
 #ask for the right settings:
@@ -94,13 +94,13 @@ class Neural_Network(nn.Module):
 					getattr(self, 'W'+str(i+1))[j][z] = weightsL[i][j][z] +val
 
 
-
-def evolutionFunc():
+def evolutionFunc(numbOfEvolve):
 	listOfSurvivors = []
 	listOfLosers = []
 	for j in range (amountOfNeuralNetwork):
 		if lifeOrDie[j] == 1:
 		  	listOfSurvivors.append(j)
+		  	writeInfoToFile(listOfSurvivors[len(listOfSurvivors)-1], numbOfEvolve)
 		else:
 			listOfLosers.append(j)
 
@@ -163,9 +163,9 @@ def neuralNetworkMovement(whichNN):
 def toMateOrNotToMate(whichNN, ans):
 	lifeOrDie[whichNN] = ans
 
-def writeInfoToFile(numb):
+def writeInfoToFile(numb, evolution):
 	f = open("weightsFile.txt", "a")
-	f.write(str(numb) + str(' here we can provide some updates to the file if needed.') +str('\n'))
+	f.write(str(evolution) + str(list_objects[numb].weightListV()) +str('\n'))
 	f.close()
 
 
@@ -192,11 +192,11 @@ for j in range(batchSize):
 
 
 	#Mega Evolve and save the best weights per evolution in file.
-	writeInfoToFile(j)
+	#writeInfoToFile(j)
 	
 	#print('evolve')
 	#evolve
-	evolutionFunc()
+	evolutionFunc(j)
 	#restart process
 
 
