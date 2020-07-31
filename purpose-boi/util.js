@@ -4,6 +4,7 @@ let S = require('./settings.js');
 let Game = require('./game.js');
 let Cache = require('./cache.js');
 let readline = require('readline');
+let {Worker} = require('worker_threads');
 
 class Util {
 	static createNextMoveSet(field, player, forceFill = false) {
@@ -64,6 +65,17 @@ class Util {
 		});
 
 		return win;
+	}
+
+	static runWorker(workerData) {
+		return new Promise((resolve, reject) => {
+			let worker = new Worker('./worker.js', {workerData});
+			worker.on('message', resolve);
+			worker.on('error', reject);
+			worker.on('exit', (code) => {
+				if (code !== 0) reject(new Error(`Worker stopped with exit code ${code}`));
+			})
+		});
 	}
 }
 

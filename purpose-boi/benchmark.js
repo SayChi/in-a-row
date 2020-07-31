@@ -10,7 +10,7 @@ class Benchmark {
 		this.depth = depth;
 	}
 
-	run() {
+	async run(multithreaded = true) {
 		let field = Game.createField();
 		let winMask = Game.createWinMask();
 
@@ -22,7 +22,17 @@ class Benchmark {
 		cache.clearCache(true);
 
 		let startTime = (new Date()).getTime();
-		let data = ai.buildPredictionTree(field, 1, this.depth);
+		let data;
+		if (multithreaded) {
+			data = await ai.start(field, 1, this.depth);
+			data = data.reduce((acc, cur) => ({
+				p1Wins: acc.p1Wins + cur.p1Wins,
+				p2Wins: acc.p2Wins + cur.p2Wins,
+				und: acc.und + cur.und
+			}), {p1Wins: 0, p2Wins: 0, und: 0});
+		}else {
+			data = ai.buildPredictionTree(field, 1, this.depth);
+		}
 		let endTime = (new Date()).getTime();
 
 		Object.assign(data, {

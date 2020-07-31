@@ -3,12 +3,36 @@
 let Cache = require('./cache.js');
 let Counters = require('./counters.js');
 let Util = require('./util.js');
-let Game = require('./game.js');
 let S = require('./settings.js');
 
 class AI {
 	constructor(winMask) {
 		this.winMask = winMask;
+	}
+
+	async start(field, player, depth) {
+		let moves = Util.createNextMoveSet(field, player, true);
+
+		let cache = new Cache();
+		let counters = new Counters();
+		cache.clearCache();
+		
+		let promises = moves.map(move => Util.runWorker({
+			field: move,
+			player: player == 1 ? 2 : 1,
+			depth: depth - 1,
+			cache: cache.cache,
+			winMask: this.winMask
+		}));
+		let workerResults = await Promise.all(promises);
+		let results = workerResults.map(data => data.result);
+
+		workerResults.forEach(data => {
+			Object.assign(cache.cache, data.cache);
+			Object.keys(data.counters).forEach(counterKey => counters[counterKey] += data.counters[counterKey])
+		});
+
+		return results;
 	}
 
 	buildPredictionTree(field, player, depth) {

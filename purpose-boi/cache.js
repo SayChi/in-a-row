@@ -3,16 +3,18 @@
 let S = require('./settings.js');
 
 class Cache {
-	constructor() {
+	constructor(cache = {}) {
 		if (Cache.instance) {
 			return Cache.instance;
 		}
 
-		this.cache = {};
+		this.cache = cache;
 		Cache.instance = this;
 	}
 
 	static createCacheKey(field) {
+		if (!field) {return}
+		
 		return "".concat(...field.map(col => "".concat(...col)));
 	}
 
