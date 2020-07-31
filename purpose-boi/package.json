@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node index.js"
+    "play": "node run/playable.js",
+    "benchmark": "node run/benchmark.js",
+    "depth-benchmark": "node run/depth-benchmark.js"
   },
   "author": "",
   "license": "ISC"
