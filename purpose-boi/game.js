@@ -25,28 +25,28 @@ class Game {
 		return field;
 	}
 
-	static createWinMask() {
+	static createWinMask(width = S.width, height = S.height, winLength = S.winLength) {
 		let winMask = [];
 
-		for (var x = 0; x < S.width; x++) {
-			for (var y = 0; y < S.height; y++) {
+		for (var x = 0; x < width; x++) {
+			for (var y = 0; y < height; y++) {
 				for (var i = 0; i < S.winDirs.length; i++) {
 					let winDir = S.winDirs[i];
 					let winRow = [];
 
-					for (var d = 0; d < S.winLength; d++) {
+					for (var d = 0; d < winLength; d++) {
 						let dx = d * winDir.x;
 						let dy = d * winDir.y;
 
 						let x2 = x + dx;
 						let y2 = y + dy;
 
-						if (0 > x2 || x2 > S.width - 1 || 0 > y2 || y2 > S.height - 1) {break;}
+						if (0 > x2 || x2 > width - 1 || 0 > y2 || y2 > height - 1) {break;}
 
 						winRow.push({x: x2, y: y2});
 					}
 
-					if (winRow.length == S.winLength) {
+					if (winRow.length == winLength) {
 						winMask.push(winRow);
 					}
 				}
@@ -62,7 +62,7 @@ class Game {
 
 		let amountInCol = fieldClone[col].filter(item => item > 0).length;
 
-		if (amountInCol > S.height - 1) {throw new Error('Col full')}
+		if (amountInCol > field[0].length - 1) {throw new Error('Col full')}
 
 		fieldClone[col][amountInCol] = player;
 

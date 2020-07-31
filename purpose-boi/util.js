@@ -27,7 +27,7 @@ class Util {
 	}
 
 	static displayField(field) {
-		for (let y = S.height - 1; y >= 0; y--) {
+		for (let y = field[0].length - 1; y >= 0; y--) {
 			console.log("".concat(...field.map(col => col[y] + " ")) + "    " + y);
 		}
 
