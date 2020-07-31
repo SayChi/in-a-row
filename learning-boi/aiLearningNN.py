@@ -104,16 +104,28 @@ for i in range (amountOfNeuralNetwork):
 
 
 for i in range (amountOfNeuralNetwork):
-	highestNumb = -1
-	counter = -1
-	ans = list_objects[i].predict()
-	for j in range (len(ans)):
-		if ans[j] > highestNumb:
-			counter = j+1
-			highestNumb = ans[j]
-	print('this row we gonna put the ball in --------------->   ' + str(counter))
+	playing = 1
+	while(playing):
+		highestNumb = -1
+		counter = -1
+		ans = list_objects[i].predict()
+		for j in range (len(ans)):
+			if ans[j] > highestNumb:
+				counter = j+1
+				highestNumb = ans[j]
+		print('this row we gonna put the ball in --------------->   ' + str(counter))
+        
+		#verwerk reactie
+		answer = numpy.random.randint(0, 10, size=1)
+		print(answer)
+		if answer > 5:
+			playing = 0
+		else:
+			fistAns = numpy.random.randint(0, 10, size=1)
+			secondAns = numpy.random.randint(0, 10, size=1)
+			toPredict = torch.tensor(([1,0]), dtype=torch.float)
 
-    
+ 
 #print (len(list_objects))
 
 #Debug purposes
