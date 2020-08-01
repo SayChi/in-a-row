@@ -1,7 +1,7 @@
 'use strict';
 
 let {spawn} = require('child_process');
-let {Readable, Writable, Stream} = require('stream');
+let {Readable} = require('stream');
 
 let args = process.argv.slice(2);
 let width = parseInt(args[0]);
