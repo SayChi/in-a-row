@@ -13,6 +13,7 @@ let ai2 = 4 in args ? args[4] : 'js';
 let initialField = "0".repeat(width * height);
 
 let p1, p2;
+let startTime, endTime;
 
 switch(ai1) {
 	case 'js': {
@@ -33,13 +34,19 @@ send(p1, initialField);
 
 function send(player, message) {
 	let stream = Readable.from(message);
-	stream.on('readable', () => player.stdin.write(stream.read()));
+	stream.on('readable', () => {
+		player.stdin.write(stream.read());
+		startTime = (new Date()).getTime();
+	});
 }
 
 function getResponseProcessor(fromPlayer, toPlayer) {
 	return () => {
 		let buffer = fromPlayer.stdout.read();
 		if (!buffer) {return}
+
+		endTime = (new Date()).getTime();
+		console.log(`Took ${(endTime - startTime) / 1000}s`);
 
 		let response = buffer.toString().replace(/\r?\n|\r/g, '');
 		printField(response);
