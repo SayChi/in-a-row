@@ -8,6 +8,8 @@ let {Worker} = require('worker_threads');
 
 class Util {
 	static createNextMoveSet(field, player, forceFill = false) {
+		if (!field) {return []}
+
 		let moves = [];
 
 		for (let i = 0; i < field.length; i++) {
