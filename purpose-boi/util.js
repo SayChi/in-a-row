@@ -32,7 +32,7 @@ class Util {
 		}
 
 		console.log("");
-		console.log("".concat(..."a".repeat(S.width).split("").map((item, index) => index + " ")));
+		console.log("".concat(..."a".repeat(field.length).split("").map((item, index) => index + " ")));
 		console.log("");
 		console.log("");
 	}
