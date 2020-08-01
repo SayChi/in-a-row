@@ -12,11 +12,21 @@ let ai2 = args[4];
 
 let initialField = "0".repeat(width * height);
 
-let p1 = spawn('node', ['run/console-war.js', width, height, winLength, 1], {cwd: './../purpose-boi'});
-let p2 = spawn('node', ['run/console-war.js', width, height, winLength, 2], {cwd: './../purpose-boi'});
+let p1, p2;
+
+switch(ai1) {
+	case "js": {
+		p1 = spawn('node', ['run/console-war.js', width, height, winLength, 1], {cwd: './../purpose-boi'});
+	}
+}
+
+switch(ai2) {
+	case "js": {
+		p2 = spawn('node', ['run/console-war.js', width, height, winLength, 2], {cwd: './../purpose-boi'});
+	}
+}
 
 p1.stdout.on('readable', getResponseProcessor(p1, p2));
-
 p2.stdout.on('readable', getResponseProcessor(p2, p1));
 
 send(p1, initialField);
@@ -48,6 +58,6 @@ function printField(serialFieldString) {
 	for (let y = field[0].length - 1; y >= 0; y--) {
 		console.log("".concat(...field.map(col => col[y] + " ")));
 	}
-	
+
 	console.log("");
 }
