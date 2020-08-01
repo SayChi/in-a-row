@@ -4,24 +4,24 @@ let {spawn} = require('child_process');
 let {Readable} = require('stream');
 
 let args = process.argv.slice(2);
-let width = parseInt(args[0]);
-let height = parseInt(args[1]);
-let winLength = parseInt(args[2]);
-let ai1 = args[3];
-let ai2 = args[4];
+let width = 0 in args ? parseInt(args[0]) : 7;
+let height = 1 in args ? parseInt(args[1]) : 6;
+let winLength = 2 in args ? parseInt(args[2]) : 4;
+let ai1 = 3 in args ? args[3] : 'js';
+let ai2 = 4 in args ? args[4] : 'js';
 
 let initialField = "0".repeat(width * height);
 
 let p1, p2;
 
 switch(ai1) {
-	case "js": {
+	case 'js': {
 		p1 = spawn('node', ['run/console-war.js', width, height, winLength, 1], {cwd: './../purpose-boi'});
 	}
 }
 
 switch(ai2) {
-	case "js": {
+	case 'js': {
 		p2 = spawn('node', ['run/console-war.js', width, height, winLength, 2], {cwd: './../purpose-boi'});
 	}
 }
