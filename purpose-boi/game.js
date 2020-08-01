@@ -17,9 +17,9 @@ class Game {
 		this.p2Bot = p2Bot;
 	}
 
-	static createField() {
-		let field = new Array(S.width);
-		field.fill(new Array(S.height));
+	static createField(width = S.width, height = S.height) {
+		let field = new Array(width);
+		field.fill(new Array(height));
 		field.map(row => row.fill(0));
 
 		return field;

@@ -10,7 +10,7 @@ class Util {
 	static createNextMoveSet(field, player, forceFill = false) {
 		let moves = [];
 
-		for (let i = 0; i < S.width; i++) {
+		for (let i = 0; i < field.length; i++) {
 			try {
 				let fieldClone = [];
 				field.forEach(col => fieldClone.push([...col]));
@@ -58,7 +58,7 @@ class Util {
 
 				if (field[x][y] != player) {break}
 
-				if (j == S.winLength - 1) {
+				if (j == winRow.length - 1) {
 					win = true;
 				}
 			}
