@@ -73,19 +73,19 @@ class AI {
 
 		if (player == 1 && p1WinCount >= 1) {
 			counters.p1PruneCounter++;
-			return {p1Wins: S.width, p2Wins: 0, und: 0}
+			return {p1Wins: field.length, p2Wins: 0, und: 0}
 		}
 		if (player == 1 && p2WinCount >= 2) {
 			counters.p1LossPruneCounter++;
-			return {p1Wins: 0, p2Wins: S.width, und: 0}
+			return {p1Wins: 0, p2Wins: field.length, und: 0}
 		}
 		if (player == 2 && p2WinCount >= 1) {
 			counters.p2PruneCounter++;
-			return {p1Wins: 0, p2Wins: S.width, und: 0}
+			return {p1Wins: 0, p2Wins: field.length, und: 0}
 		}
 		if (player == 2 && p1WinCount >= 2) {
 			counters.p2LossPruneCounter++;
-			return {p1Wins: S.width, p2Wins: 0, und: 0}
+			return {p1Wins: field.length, p2Wins: 0, und: 0}
 		}
 
 		moves = moves.map(move => {
