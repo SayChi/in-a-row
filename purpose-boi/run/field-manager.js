@@ -23,6 +23,15 @@ process.stdin.on('readable', async function() {
 
 	field = Game.throwCoin(field, col, player2Turn ? 2 : 1);
 
-	console.log(Cache.createCacheKey(field));
+	if (Util.checkWin(field, winMask, 1)) {
+		console.log("winner p1");
+	}else if (Util.checkWin(field, winMask, 2)) {
+		console.log("winner p2");
+	}else if (field.reduce((acc, cur) => acc + cur.filter(item => item == 0).length, 0) == 0) {
+		console.log("tie");
+	}else {
+		console.log(Cache.createCacheKey(field));
+	}
+
 	process.stdin.resume();
 });
