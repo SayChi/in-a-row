@@ -15,7 +15,7 @@ let winMask = Game.createWinMask(width, height, winLength);
 process.stdin.resume();
 process.stdin.setEncoding('utf8');
 
-process.stdin.on('readable', async function() {
+process.stdin.on('readable', function() {
 	let col = process.stdin.read().replace(/\r?\n|\r/g, '');
 	let count1s = field.reduce((acc, cur) => acc + cur.filter(item => item == 1).length, 0);
 	let count2s = field.reduce((acc, cur) => acc + cur.filter(item => item == 2).length, 0);
