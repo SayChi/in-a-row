@@ -46,6 +46,10 @@ class Cache {
 			}
 		});
 	}
+
+	static destroy() {
+		Cache.instance = null;
+	}
 }
 
 module.exports = Cache;

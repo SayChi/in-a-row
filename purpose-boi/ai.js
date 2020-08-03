@@ -4,10 +4,12 @@ let Cache = require('./cache.js');
 let Counters = require('./counters.js');
 let Util = require('./util.js');
 let S = require('./settings.js');
+let WorkerPool = require('./worker-pool.js');
 
 class AI {
 	constructor(winMask) {
 		this.winMask = winMask;
+		new WorkerPool(S.poolSize);
 	}
 
 	async start(field, player, depth) {
@@ -15,9 +17,10 @@ class AI {
 
 		let cache = new Cache();
 		let counters = new Counters();
+		let workerPool = new WorkerPool();
 		cache.clearCache();
-		
-		let promises = moves.map(move => Util.runWorker({
+
+		let promises = moves.map(move => workerPool.execute({
 			field: move,
 			player: player == 1 ? 2 : 1,
 			depth: depth - 1,
