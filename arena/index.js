@@ -13,7 +13,10 @@ let ai2 = 4 in args ? args[4] : 'js';
 let initialField = "0".repeat(width * height);
 
 let p1, p2;
+let fieldManager;
 let startTime, endTime;
+
+fieldManager = spawn('node', ['run/field-manager.js', width, height, winLength], {cwd: './../purpose-boi'});
 
 switch(ai1) {
 	case 'js': {
@@ -27,20 +30,21 @@ switch(ai2) {
 	}
 }
 
-p1.stdout.on('readable', getResponseProcessor(p1, p2));
-p2.stdout.on('readable', getResponseProcessor(p2, p1));
+p1.stdout.on('readable', getResponseProcessor(p1));
+p2.stdout.on('readable', getResponseProcessor(p2));
+fieldManager.stdout.on('readable', fieldManagerProcessor);
 
 send(p1, initialField);
 
-function send(player, message) {
+function send(process, message) {
 	let stream = Readable.from(message);
 	stream.on('readable', () => {
-		player.stdin.write(stream.read());
+		process.stdin.write(stream.read());
 		startTime = (new Date()).getTime();
 	});
 }
 
-function getResponseProcessor(fromPlayer, toPlayer) {
+function getResponseProcessor(fromPlayer) {
 	return () => {
 		let buffer = fromPlayer.stdout.read();
 		if (!buffer) {return}
@@ -49,9 +53,9 @@ function getResponseProcessor(fromPlayer, toPlayer) {
 		console.log(`Took ${(endTime - startTime) / 1000}s`);
 
 		let response = buffer.toString().replace(/\r?\n|\r/g, '');
-		printField(response);
+		console.log(`Column ${response}`);
 
-		send(toPlayer, response);
+		send(fieldManager, response);
 	}
 }
 
@@ -67,4 +71,37 @@ function printField(serialFieldString) {
 	}
 
 	console.log("");
+}
+
+function fieldManagerProcessor() {
+	let buffer = fieldManager.stdout.read();
+	if (!buffer) {return}
+
+	let response = buffer.toString().replace(/\r?\n|\r/g, '');
+	
+	switch(response) {
+		case "winner p1":
+			console.log("winner p1");
+			break;
+
+		case "winner p2":
+			console.log("winner p2");
+			break;
+
+		case "tie":
+			console.log("tie");
+			break;
+
+		default:
+			printField(response);
+
+			let count1s = (response.match(/1/g) || []).length;
+			let count2s = (response.match(/2/g) || []).length;
+			let player2Turn = count1s > count2s;
+			let p = player2Turn ? p2 : p1;
+
+			send(p, response);
+
+			break;
+	}
 }
