@@ -8,9 +8,11 @@ let {Worker} = require('worker_threads');
 
 class Util {
 	static createNextMoveSet(field, player, forceFill = false) {
+		if (!field) {return []}
+
 		let moves = [];
 
-		for (let i = 0; i < S.width; i++) {
+		for (let i = 0; i < field.length; i++) {
 			try {
 				let fieldClone = [];
 				field.forEach(col => fieldClone.push([...col]));
@@ -32,7 +34,7 @@ class Util {
 		}
 
 		console.log("");
-		console.log("".concat(..."a".repeat(S.width).split("").map((item, index) => index + " ")));
+		console.log("".concat(..."a".repeat(field.length).split("").map((item, index) => index + " ")));
 		console.log("");
 		console.log("");
 	}
@@ -58,7 +60,7 @@ class Util {
 
 				if (field[x][y] != player) {break}
 
-				if (j == S.winLength - 1) {
+				if (j == winRow.length - 1) {
 					win = true;
 				}
 			}
