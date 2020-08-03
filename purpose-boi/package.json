@@ -7,7 +7,8 @@
     "play": "node run/playable.js",
     "benchmark": "node run/benchmark.js",
     "depth-benchmark": "node run/depth-benchmark.js",
-    "console-war": "node run/console-war.js"
+    "console-war": "node run/console-war.js",
+    "field-manager": "node run/field-manager.js"
   },
   "author": "",
   "license": "ISC"

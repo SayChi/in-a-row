@@ -5,6 +5,11 @@
 |                       |P1 Bot       |true   |If player 1 is a bot                            |
 |                       |P2 Bot       |true   |If player 2 is a bot                            |
 |                       |             |       |                                                |
+|npm run field-manager  |             |       |Runs an instance that just tracks a field       |
+|                       |Width        |       |Width of the field                              |
+|                       |Height       |       |Height of the field                             |
+|                       |Win length   |       |The length of a winning row                     |
+|                       |             |       |                                                |
 |npm run benchmark      |             |       |Runs a benchmark at a certain depth             |
 |                       |Depth        |6      |How many steps ahead the AI looks               |
 |                       |Multithreaded|true   |If the AI runs multithreaded                    |

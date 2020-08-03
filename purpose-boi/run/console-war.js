@@ -31,12 +31,25 @@ process.stdin.on('readable', async function() {
 		field[x] = flatField.slice(x * height, (x + 1) * height);
 	}
 
-	let data = (await new AI(winMask).start(field, player, depth)).map(result => result ? result : {p1Wins: 0, p2Wins: 9999999, und: 0});
+	let data = (await ai.start(field, player, depth)).map(result => 
+		result ? 
+			result
+			:
+			(player == 1 ? {p1Wins: 0, p2Wins: 9999999, und: 0} : {p1Wins: 9999999, p2Wins: 0, und: 0})
+	);
 	let processed = data.map(item => {
 		let total = item.p1Wins + item.p2Wins + item.und;
 		let playerWins = player == 1 ? item.p1Wins : item.p2Wins;
 
-		return total > 0 ? playerWins / total : -999999;
+		if (total == 0) {
+			return -999999;
+		}
+
+		if (total == playerWins) {
+			return 1 + (1 / playerWins);
+		}
+
+		return playerWins / total;
 	});
 	let max = Math.max(...processed);
 	let col = processed.indexOf(max);

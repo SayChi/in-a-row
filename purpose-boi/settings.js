@@ -9,4 +9,5 @@ module.exports = {
 		{x: -1, y: 1}
 	],
 	useCache: true,
+	poolSize: 10,
 }
