@@ -40,8 +40,7 @@ process.stdin.on('readable', async function() {
 	});
 	let max = Math.max(...processed);
 	let col = processed.indexOf(max);
-	field = Game.throwCoin(field, col, player);
 
-	console.log(Cache.createCacheKey(field));
+	console.log(col);
 	process.stdin.resume();
 });

@@ -30,8 +30,8 @@ switch(ai2) {
 	}
 }
 
-p1.stdout.on('readable', getResponseProcessor(p1, p2));
-p2.stdout.on('readable', getResponseProcessor(p2, p1));
+p1.stdout.on('readable', getResponseProcessor(p1));
+p2.stdout.on('readable', getResponseProcessor(p2));
 fieldManager.stdout.on('readable', fieldManagerProcessor);
 
 send(p1, initialField);
@@ -44,7 +44,7 @@ function send(process, message) {
 	});
 }
 
-function getResponseProcessor(fromPlayer, toPlayer) {
+function getResponseProcessor(fromPlayer) {
 	return () => {
 		let buffer = fromPlayer.stdout.read();
 		if (!buffer) {return}
@@ -53,9 +53,9 @@ function getResponseProcessor(fromPlayer, toPlayer) {
 		console.log(`Took ${(endTime - startTime) / 1000}s`);
 
 		let response = buffer.toString().replace(/\r?\n|\r/g, '');
-		printField(response);
+		console.log(`Column ${response}`);
 
-		send(toPlayer, response);
+		send(fieldManager, response);
 	}
 }
 
@@ -74,7 +74,7 @@ function printField(serialFieldString) {
 }
 
 function fieldManagerProcessor() {
-	let buffer = fromPlayer.stdout.read();
+	let buffer = fieldManager.stdout.read();
 	if (!buffer) {return}
 
 	let response = buffer.toString().replace(/\r?\n|\r/g, '');
@@ -94,7 +94,7 @@ function fieldManagerProcessor() {
 
 		default:
 			printField(response);
-			
+
 			let count1s = (response.match(/1/g) || []).length;
 			let count2s = (response.match(/2/g) || []).length;
 			let player2Turn = count1s > count2s;
