@@ -36,7 +36,15 @@ process.stdin.on('readable', async function() {
 		let total = item.p1Wins + item.p2Wins + item.und;
 		let playerWins = player == 1 ? item.p1Wins : item.p2Wins;
 
-		return total > 0 ? playerWins / total : -999999;
+		if (total == 0) {
+			return -999999;
+		}
+
+		if (total == playerWins) {
+			return 1 + (1 / playerWins);
+		}
+
+		return playerWins / total;
 	});
 	let max = Math.max(...processed);
 	let col = processed.indexOf(max);

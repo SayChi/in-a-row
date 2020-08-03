@@ -80,7 +80,19 @@ class Game {
 			if (p1Turn) {
 				if (p1Bot) {
 					let data = (await new AI(winMask).start(field, 1, depth)).map(result => result ? result : {p1Wins: 0, p2Wins: 9999999, und: 0});
-					let processed = data.map(item => item.p1Wins + item.p2Wins + item.und > 0 ? item.p1Wins / (item.p1Wins + item.p2Wins + item.und) : -999999);
+					let processed = data.map(item => {
+						let total = item.p1Wins + item.p2Wins + item.und;
+
+						if (total == 0) {
+							return -999999;
+						}
+
+						if (total == item.p1Wins) {
+							return 1 + (1 / item.p1Wins);
+						}
+
+						return item.p1Wins / total;
+					});
 					let max = Math.max(...processed);
 					let col = processed.indexOf(max);
 					field = this.constructor.throwCoin(field, col, 1);
@@ -91,7 +103,19 @@ class Game {
 			}else {
 				if (p2Bot) {
 					let data = (await new AI(winMask).start(field, 2, depth)).map(result => result ? result : {p1Wins: 9999999, p2Wins: 0, und: 0});
-					let processed = data.map(item => item.p1Wins + item.p2Wins + item.und > 0 ? item.p2Wins / (item.p1Wins + item.p2Wins + item.und) : -999999);
+					let processed = data.map(item => {
+						let total = item.p1Wins + item.p2Wins + item.und;
+
+						if (total == 0) {
+							return -999999;
+						}
+
+						if (total == item.p2Wins) {
+							return 1 + (1 / item.p2Wins);
+						}
+
+						return item.p2Wins / total;
+					});
 					let max = Math.max(...processed);
 					let col = processed.indexOf(max);
 					field = this.constructor.throwCoin(field, col, 2);
